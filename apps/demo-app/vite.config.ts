@@ -6,7 +6,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/react-perf-monitor-hook',
+  cacheDir: '../../node_modules/.vite/apps/demo-app',
   server: {
     port: 4200,
     host: 'localhost',
@@ -21,7 +21,7 @@ export default defineConfig({
   //  plugins: [ nxViteTsPaths() ],
   // },
   build: {
-    outDir: '../../dist/apps/react-perf-monitor-hook',
+    outDir: '../../dist/apps/demo-app',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {

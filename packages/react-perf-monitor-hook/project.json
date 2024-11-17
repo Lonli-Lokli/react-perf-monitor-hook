@@ -1,8 +1,8 @@
 {
   "name": "react-perf-monitor-hook",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/react-perf-monitor-hook/src",
-  "projectType": "application",
+  "sourceRoot": "packages/react-perf-monitor-hook/src",
+  "projectType": "library",
   "tags": [],
   "// targets": "to see all targets run: nx show project react-perf-monitor-hook --web",
   "targets": {}

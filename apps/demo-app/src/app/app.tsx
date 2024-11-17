@@ -6,7 +6,7 @@ import NxWelcome from './nx-welcome';
 export function App() {
   return (
     <div>
-      <NxWelcome title="react-perf-monitor-hook" />
+      <NxWelcome title="demo-app" />
     </div>
   );
 }

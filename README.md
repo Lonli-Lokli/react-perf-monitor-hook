@@ -1,82 +1,244 @@
-# ReactPerfMonitorHook
+# React Performance Monitor Hook
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A highly configurable React hook for monitoring and reporting various performance metrics in React components, including frame rates, memory usage, DOM metrics, and timing measurements.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## Table of Contents
+- [Installation](#installation)
+- [Features](#features)
+- [Usage](#usage)
+- [Configuration](#configuration)
+  - [Configuration Options](#configuration-options)
+  - [Default Configuration](#default-configuration)
+- [Examples](#examples)
+  - [Basic Usage](#basic-usage)
+  - [Custom Configuration](#custom-configuration)
+  - [Selective Monitoring](#selective-monitoring)
+- [Output Format](#output-format)
+- [Important Notes](#important-notes)
+- [Best Practices](#best-practices)
+- [Browser Support](#browser-support)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Installation
 
-## Finish your CI setup
-
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/q5HDFniNZv)
-
-
-## Run tasks
-
-To run the dev server for your app, use:
-
-```sh
-npx nx serve react-perf-monitor-hook
+```bash
+npm install react-performance-monitor
+# or
+yarn add react-performance-monitor
 ```
 
-To create a production bundle:
+## Features
 
-```sh
-npx nx build react-perf-monitor-hook
+- 📊 Frame metrics (FPS, dropped frames)
+- 💾 Memory usage tracking
+- 🌳 DOM metrics (node count, mutations)
+- ⏱️ Timing measurements (render, script, paint)
+- 📝 Customizable logging
+- 🎯 Configurable sampling rate
+- 📈 Metrics buffering
+
+## Usage
+
+```jsx
+import { usePerformanceMonitor } from 'react-performance-monitor';
+
+function MyComponent() {
+  usePerformanceMonitor('MyComponent', {
+    frames: true,
+    memory: true,
+    dom: true,
+    timing: true
+  });
+
+  return (
+    <div data-component="MyComponent">
+      {/* Your component content */}
+    </div>
+  );
+}
 ```
 
-To see all available targets to run for a project, run:
+## Configuration
 
-```sh
-npx nx show project react-perf-monitor-hook
+The hook accepts two parameters:
+- `componentName`: string - Unique identifier for the component
+- `config`: PerformanceMonitorConfig (optional) - Configuration object
+
+### Configuration Options
+
+```typescript
+interface PerformanceMonitorConfig {
+  frames?: boolean | {
+    fps?: boolean;      // Track frames per second
+    dropped?: boolean;  // Track dropped frames count
+  };
+  
+  memory?: boolean | {
+    nodes?: boolean;    // Track detached DOM nodes
+    heap?: boolean;     // Track heap memory usage
+  };
+  
+  dom?: boolean | {
+    count?: boolean;    // Track total node count
+    mutations?: boolean; // Track node additions/removals
+  };
+  
+  timing?: boolean | {
+    render?: boolean;   // Track render time
+    script?: boolean;   // Track script execution time
+    paint?: boolean;    // Track painting time
+  };
+  
+  logging?: {
+    enabled?: boolean;  // Enable/disable logging
+    decimals?: number;  // Number of decimal points for durations
+    prefix?: string;    // Log prefix format
+    onMetrics?: (message?: any, ...optionalParams: any[]) => void;
+  };
+  
+  sampleRate?: number;  // Measure every nth render
+  bufferSize?: number;  // Number of measurements to average
+}
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### Default Configuration
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/react:app demo
+```typescript
+const DEFAULT_CONFIG = {
+  frames: { fps: true, dropped: false },
+  memory: { nodes: true, heap: false },
+  dom: { count: true, mutations: false },
+  timing: { render: true, script: true, paint: true },
+  logging: { enabled: true, decimals: 2, onMetrics: console.log },
+  sampleRate: 1,
+  bufferSize: 1
+};
 ```
 
-To generate a new library, use:
+## Examples
 
-```sh
-npx nx g @nx/react:lib mylib
+### Basic Usage
+
+```jsx
+function SimpleComponent() {
+  usePerformanceMonitor('SimpleComponent');
+  return <div data-component="SimpleComponent">Hello World</div>;
+}
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Custom Configuration
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```jsx
+function ComplexComponent() {
+  usePerformanceMonitor('ComplexComponent', {
+    frames: { fps: true, dropped: true },
+    memory: { heap: true },
+    dom: { count: true, mutations: true },
+    timing: { render: true, paint: true },
+    logging: {
+      decimals: 1,
+      onMetrics: (message, metrics) => {
+        // Custom metrics handling
+        console.log(`${message}:`, metrics);
+      }
+    },
+    sampleRate: 5,  // Monitor every 5th render
+    bufferSize: 3   // Average 3 measurements before reporting
+  });
 
+  return (
+    <div data-component="ComplexComponent">
+      {/* Component content */}
+    </div>
+  );
+}
+```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Selective Monitoring
 
-## Install Nx Console
+```jsx
+function OptimizedComponent() {
+  usePerformanceMonitor('OptimizedComponent', {
+    // Only monitor frame rate and render timing
+    frames: { fps: true },
+    timing: { render: true },
+    memory: false,
+    dom: false
+  });
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+  return <div data-component="OptimizedComponent">{/* Content */}</div>;
+}
+```
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Output Format
 
-## Useful links
+The hook outputs performance metrics in the following format:
 
-Learn more:
+```javascript
+{
+  fps: "59.94 fps",          // Current frames per second
+  dropped: 2,                // Number of dropped frames
+  render: "1.50ms",          // Render time
+  script: "0.75ms",          // Script execution time
+  paint: "0.25ms",           // Paint time
+  total: "2.50ms",           // Total operation time
+  nodes: 150,                // Total DOM node count
+  heap: "25.5MB"            // Heap memory usage
+}
+```
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Important Notes
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+1. The component being monitored must have a `data-component` attribute matching the `componentName` parameter for DOM metrics to work properly.
+2. Memory metrics (heap size) may not be available in all browsers.
+3. High sampling rates or low buffer sizes may impact performance.
+4. Frame metrics are most accurate when measured over longer periods.
+
+## Best Practices
+
+- Use a higher `sampleRate` for frequently updating components
+- Increase `bufferSize` for more stable measurements
+- Disable unnecessary metrics to reduce overhead
+- Consider disabling logging in production
+- Use custom `onMetrics` handlers for production monitoring
+
+## Browser Support
+
+The hook uses the following Web APIs:
+- Performance Observer API
+- Performance Timeline API
+- requestAnimationFrame
+
+Supported in all modern browsers:
+- Chrome 58+
+- Firefox 57+
+- Safari 11+
+- Edge 79+
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Lonli-Lokli
+- GitHub: [@Lonli-Lokli](https://github.com/yourusername)
+
+## Acknowledgments
+
+- Inspired by React DevTools performance monitoring
+- Built with React Hooks
+- Special thanks to Claude AI

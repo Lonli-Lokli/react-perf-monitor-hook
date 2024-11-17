@@ -1,0 +1,23 @@
+{
+  "name": "react-perf-monitor-hook",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Lightweight React hook for real-time component performance monitoring with configurable metrics for timing, frames, memory, and DOM changes.",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "keywords": [
+    "Typescript",
+    "React",
+    "performance",
+    "hook"
+  ],
+  "author": "Lonli-Lokli",
+  "license": "MIT"
+}
